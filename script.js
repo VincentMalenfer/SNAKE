@@ -9,6 +9,8 @@ window.onload = function()
     var applee;
     var widthInBlocks = canvasWidth/blockSize;
     var heightInBlocks = canvasHeight/blockSize;
+    var score;
+    var timeout;
 
     init();
 
@@ -19,11 +21,15 @@ window.onload = function()
         canvas = document.createElement('canvas');
         canvas.width = canvasWidth;
         canvas.height = canvasHeight;
-        canvas.style.border = "1px solid";
+        canvas.style.border = "30px solid gray";
+        canvas.style.margin = "50px auto";
+        canvas.style.display = "block";
+        canvas.style.backgroundColor = "#ddd";
         document.body.appendChild(canvas);
         ctx = canvas.getContext('2d');
         snakee = new Snake([[6,4], [5,4], [4,4]], "right");
         applee = new Apple([10,10]);
+        score = 0;
         refreshCanvas();
     }
 
@@ -40,6 +46,7 @@ window.onload = function()
         {
             if(snakee.isEatingApple(applee))
             {
+                score++;
                 snakee.ateApple = true;
                 do
                 {
@@ -48,9 +55,10 @@ window.onload = function()
                 while(applee.isOnSnake(snakee))
             }
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+            drawScore();
             snakee.draw();
             applee.draw();
-            setTimeout(refreshCanvas, delay);
+            timeout = setTimeout(refreshCanvas, delay);
         }
 
     }
@@ -60,8 +68,19 @@ window.onload = function()
     function gameOver()
     {
         ctx.save();
-        ctx.fillText("Game Over", 5, 15);
-        ctx.fillText("Press the Space key to replay", 5, 30);
+        ctx.font = "bold 70px sans-serif";
+        ctx.fillStyle = "black";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 5;
+        var centreX = canvasWidth / 2;
+        var centreY = canvasHeight / 2;
+        ctx.strokeText("Game Over", centreX, centreY - 180);
+        ctx.fillText("Game Over", centreX, centreY - 180);
+        ctx.font = "bold 30px sans-serif";
+        ctx.strokeText("Press the Space key to replay", centreX, centreY - 120);
+        ctx.fillText("Press the Space key to replay", centreX, centreY - 120);
         ctx.restore();
     }
 
@@ -71,7 +90,24 @@ window.onload = function()
     {
         snakee = new Snake([[6, 4], [5, 4], [4, 4]], "right");
         applee = new Apple([10, 10]);
+        score = 0;
+        clearTimeout(timeout);
         refreshCanvas();
+    }
+
+    // Display the score
+
+    function drawScore()
+    {
+        ctx.save();
+        ctx.font = "bold 200px sans-serif";
+        ctx.fillStyle = "gray";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        var centreX = canvasWidth / 2;
+        var centreY = canvasHeight / 2;
+        ctx.fillText(score.toString(), centreX, centreY);
+        ctx.restore();
     }
 
     // Construction of the game grid
