@@ -12,6 +12,8 @@ window.onload = function()
 
     init();
 
+    // Initialization of the game elements
+
     function init()
     {
         canvas = document.createElement('canvas');
@@ -25,6 +27,8 @@ window.onload = function()
         refreshCanvas();
     }
 
+    // Function related to the display of events in the game
+
     function refreshCanvas()
     {
         snakee.advance();
@@ -34,6 +38,14 @@ window.onload = function()
         }
         else
         {
+            if(snakee.isEatingApple(applee))
+            {
+                do
+                {
+                    applee.setNewPosition();
+                }
+                while(applee.isOnSnake(snakee))
+            }
             ctx.clearRect(0, 0, canvasWidth, canvasHeight);
             snakee.draw();
             applee.draw();
@@ -42,12 +54,16 @@ window.onload = function()
 
     }
 
+    // Construction of the game grid
+
     function drawBlock(ctx, position)
     {
         var x = position[0] * blockSize;
         var y = position[1] * blockSize;
         ctx.fillRect(x,y,blockSize,blockSize);
     }
+
+    // Snake related functions
 
     function Snake(body, direction)
     {
@@ -86,6 +102,9 @@ window.onload = function()
             this.body.unshift(nextPosition);
             this.body.pop();
         };
+
+        // Snake control functions
+
         this.setDirection = function(newDirection)
         {
             var allowedDirections;
@@ -107,6 +126,9 @@ window.onload = function()
                 this.direction = newDirection;
             }
         };
+
+        // Collision check
+
         this.checkCollision = function()
         {
             var wallCollision = false;
@@ -136,7 +158,20 @@ window.onload = function()
 
             return wallCollision || snakeCollision;
         };
+
+        // Function allowing the snake to eat the apple
+
+        this.isEatingApple = function(appleToEat)
+        {
+            var head = this.body[0];
+            if(head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1])
+                return true;
+            else
+                return false;
+        }
     }
+
+    // Apple related functions
 
     function Apple(position)
     {
@@ -147,13 +182,40 @@ window.onload = function()
             ctx.fillStyle = "#33cc33";
             ctx.beginPath();
             var radius = blockSize/2;
-            var x = position[0]*blockSize + radius;
-            var y = position[1]*blockSize + radius;
+            var x = this.position[0]*blockSize + radius;
+            var y = this.position[1]*blockSize + radius;
             ctx.arc(x,y,radius,0,Math.PI*2,true);
             ctx.fill();
             ctx.restore();
-        }
+        };
+
+        // Generation of a new apple
+
+        this.setNewPosition = function()
+        {
+            var newX = Math.round(Math.random() * (widthInBlocks - 1));
+            var newY = Math.round(Math.random() * (heightInBlocks - 1));
+            this.position = [newX, newY];
+        };
+
+        // Function preventing the apple from appearing on the snake
+
+        this.isOnSnake = function(snakeToCheck)
+        {
+            var isOnSnake = false;
+
+            for(var i = 0 ; i < snakeToCheck.body.length; i++)
+            {
+                if(this.position[0] === snakeToCheck.body[i][0] && this.position[1] === snakeToCheck.body[i][1])
+                {
+                    isOnSnake = true;
+                }
+            }
+            return isOnSnake;
+        };
     }
+
+    // Here are defined the keyboard keys used
 
     document.onkeydown = function handleKeyDown(e)
     {
