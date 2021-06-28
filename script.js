@@ -34,12 +34,13 @@ window.onload = function()
         snakee.advance();
         if(snakee.checkCollision())
         {
-            // GAME OVER
+            gameOver();
         }
         else
         {
             if(snakee.isEatingApple(applee))
             {
+                snakee.ateApple = true;
                 do
                 {
                     applee.setNewPosition();
@@ -52,6 +53,25 @@ window.onload = function()
             setTimeout(refreshCanvas, delay);
         }
 
+    }
+
+    // Construction of the Game Over screen
+
+    function gameOver()
+    {
+        ctx.save();
+        ctx.fillText("Game Over", 5, 15);
+        ctx.fillText("Press the Space key to replay", 5, 30);
+        ctx.restore();
+    }
+
+    // Function allowing the user to replay
+
+    function restart()
+    {
+        snakee = new Snake([[6, 4], [5, 4], [4, 4]], "right");
+        applee = new Apple([10, 10]);
+        refreshCanvas();
     }
 
     // Construction of the game grid
@@ -69,6 +89,7 @@ window.onload = function()
     {
         this.body = body;
         this.direction = direction;
+        this.ateApple = false;
         this.draw = function()
         {
             ctx.save();
@@ -79,6 +100,9 @@ window.onload = function()
             }
             ctx.restore();
         };
+
+        // Restriction of snake movement
+
         this.advance = function()
         {
             var nextPosition = this.body[0].slice();
@@ -99,8 +123,14 @@ window.onload = function()
                 default:
                     throw("Invalid Direction");
             }
+
+            // Checking if the snake eats an apple, if "yes" he grows...
+            
             this.body.unshift(nextPosition);
-            this.body.pop();
+            if(!this.ateApple)
+                this.body.pop();
+            else
+                this.ateApple = false;
         };
 
         // Snake control functions
@@ -235,6 +265,9 @@ window.onload = function()
             case 40:
                 newDirection = "down";
             break;
+            case 32:
+                restart();
+            return;
         default:
             return;
         }
