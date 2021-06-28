@@ -60,7 +60,6 @@ window.onload = function()
             applee.draw();
             timeout = setTimeout(refreshCanvas, delay);
         }
-
     }
 
     // Construction of the Game Over screen
